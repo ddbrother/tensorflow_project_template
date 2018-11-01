@@ -27,7 +27,7 @@ def main():
     # create your data generator
     data = DataGenerator(config)
     
-    # create an instance of the model you want
+    # create an instance of the model you wantVGGModel
     model = ExampleModel(config)
     # create tensorboard logger
     logger = Logger(sess, config)
