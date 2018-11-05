@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "/home/work/anaconda3/envs/tf-cpu/bin/python",
+    "python.pythonPath": "/home/work/anaconda3/envs/tf-gpu/bin/python",
     "editor.fontSize": 18
 }

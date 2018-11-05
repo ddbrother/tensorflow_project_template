@@ -10,14 +10,15 @@ from utils.dirs import create_dirs
 from utils.logger import Logger
 from utils.utils import get_args
 
-import ConfigParser
+import configparser
 
-def test_config_parser():
-    cp = ConfigParser.ConfigParser()
+
+def main():
+    cp = configparser.ConfigParser()
     cp.read("test.ini")
 
     secs = cp.sections()
-    print cp.sections()
+    print(cp.sections())
 
     for sec in secs:
         opts = cp.options(sec)
@@ -25,38 +26,9 @@ def test_config_parser():
             val = cp.get(sec, opt)
             val += "test....."
             cp.set(sec, opt, val)
+            print(sec, opt)
 
     cp.write(open("out.ini", "w"))
-test_config_parser()
-
-def main():
-    # capture the config path from the run arguments
-    # then process the json configuration file
-    try:
-        args = get_args()
-        config = process_config(args.config)
-
-    except:
-        print("missing or invalid arguments")
-        exit(0)
-
-    # create the experiments dirs
-    create_dirs([config.summary_dir, config.checkpoint_dir])
-    # create tensorflow session
-    sess = tf.Session()
-    # create your data generator
-    data = DataGenerator(config)
-    
-    # create an instance of the model you wantVGGModel
-    model = ExampleModel(config)
-    # create tensorboard logger
-    logger = Logger(sess, config)
-    # create trainer and pass all the previous components to it
-    trainer = ExampleTrainer(sess, model, data, config, logger)
-    #load model if exists
-    model.load(sess)
-    # here you train your model
-    trainer.train()
 
 
 if __name__ == '__main__':
