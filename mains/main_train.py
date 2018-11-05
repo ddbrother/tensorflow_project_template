@@ -26,7 +26,7 @@ def main():
             val = cp.get(sec, opt)
             val += "test....."
             cp.set(sec, opt, val)
-            print(sec, opt)
+            print(sec, '.', opt, '=', val)
 
     cp.write(open("out.ini", "w"))
 
