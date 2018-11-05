@@ -1,3 +1,5 @@
+
+import __init__
 import tensorflow as tf
 
 from data_loader.data_generator import DataGenerator
