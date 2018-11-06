@@ -1,7 +1,12 @@
 import json
 from bunch import Bunch
 import os
+import tensorflow as tf
 
+
+def data_type():
+    """Return the type of the activations, weights, and placeholder variables."""
+    return tf.float32
 
 def get_config_from_json(json_file):
     """
