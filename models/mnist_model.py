@@ -55,39 +55,16 @@ class ExampleModel(BaseModel):
        
         loss += 5e-4 * regularizers # Add the regularization term to the loss.
 
-        # Optimizer: set up a variable that's incremented once per batch and
-        # controls the learning rate decay.
-        batch = tf.Variable(0, dtype=data_type())
         # Decay once per epoch, using an exponential schedule starting at 0.01.
-        learning_rate = tf.train.exponential_decay(
-            0.01,                # Base learning rate.
-            batch * BATCH_SIZE,  # Current index into the dataset.
-            train_size,          # Decay step.
-            0.95,                # Decay rate.
-            staircase=True)
+        learning_rate = tf.train.exponential_decay(0.01,  self.global_step_tensor, 1.0, 0.95, staircase=True)
+        
         # Use simple momentum for the optimization.
-        self.train_step = tf.train.MomentumOptimizer(learning_rate,0.9).minimize(loss, global_step=batch)
+        optimizer = tf.train.MomentumOptimizer(learning_rate,0.9).minimize(loss, global_step=self.global_step_tensor)
+        
+        self.cross_entropy = loss
+        self.train_step = optimizer
 
-        # Predictions for the current training minibatch.
-        train_prediction = tf.nn.softmax(logits)
-
-        # Predictions for the test and validation, which we'll compute less often.
-        eval_prediction = tf.nn.softmax(model(eval_data))
-
-        self.is_training = tf.placeholder(tf.bool)
-
-        self.x = tf.placeholder(tf.float32, shape=[None] + self.config.state_size)
-        self.y = tf.placeholder(tf.float32, shape=[None, 10])
-
-        # network architecture
-        d1 = tf.layers.dense(self.x, 512, activation=tf.nn.relu, name="dense1")
-        d2 = tf.layers.dense(d1, 10, name="dense2")
-
-        self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y, logits=d2))
-        self.train_step = tf.train.AdamOptimizer(
-            self.config.learning_rate).minimize(self.cross_entropy,
-            global_step=self.global_step_tensor)
-        correct_prediction = tf.equal(tf.argmax(d2, 1), tf.argmax(self.y, 1))
+        correct_prediction = tf.nn.softmax(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y, logits=logits))
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 

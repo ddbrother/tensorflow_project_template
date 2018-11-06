@@ -1,9 +1,22 @@
 {
   "exp_name": "example",
-  "num_epochs": 3,
-  "num_iter_per_epoch": 10,
+  "num_epochs": 5,
+  "num_iter_per_epoch": 800,
   "learning_rate": 0.001,
-  "batch_size": 16,
+  "batch_size": 64,
   "state_size": [784],
-  "max_to_keep":5
+  "max_to_keep":5,
+
+  "flags": 0,
+  "source_url" :"http://yann.lecun.com/exdb/mnist/",
+  "work_directory" : "",
+  "image_size" : 28,
+  "num_channels" : 1,
+  "pixel_depth" : 255,
+  "num_labels" : 10,
+  "validation_size" : 5000,
+  "seed" : 66478,
+  "eval_batch_size" : 64,
+  "eval_frequency" : 100,
+  "keep_prob": 0.5
 }
