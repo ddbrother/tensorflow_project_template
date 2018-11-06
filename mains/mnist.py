@@ -406,4 +406,4 @@ if __name__ == '__main__':
 
   FLAGS, unparsed = parser.parse_known_args()
   WORK_DIRECTORY = FLAGS.input_dir
-  tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
+  main([sys.argv[0]] + unparsed)
