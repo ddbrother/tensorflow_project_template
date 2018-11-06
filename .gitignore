@@ -105,7 +105,8 @@ ENV/
 .idea/modules.xml
 .idea/workspace.xml
 experiments/
-
+export/
+output/
 
 # Data
 *.gz
