@@ -64,9 +64,8 @@ class ExampleModel(BaseModel):
         self.cross_entropy = loss
         self.train_step = optimizer
 
-        correct_prediction = tf.nn.softmax(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y, logits=logits))
+        correct_prediction = tf.equal(tf.argmax(logits, 1), self.y)
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
 
     def init_saver(self):
         # here you initialize the tensorflow saver that will be used in saving the checkpoints.
