@@ -11,7 +11,7 @@ class BaseModel:
 
     # save function that saves the checkpoint in the path defined in the config file
     def save(self, sess):
-        print("Saving model epoch", self.cur_epoch_tensor.eval(sess), "...")
+        print("Saving model epoch", '%04d' % self.cur_epoch_tensor.eval(sess), "...")
         self.saver.save(sess, self.config.checkpoint_dir, self.global_step_tensor)
         print("Model saved")
 

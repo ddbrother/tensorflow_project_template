@@ -11,6 +11,7 @@ from utils.dirs import create_dirs
 from utils.logger import Logger
 from utils.utils import get_args
 
+import os
 
 def main():
     # capture the config path from the run arguments
@@ -24,6 +25,10 @@ def main():
         exit(0)
 
     # create the experiments dirs
+    if os.path.exists(config.summary_dir):
+        os.removedirs(config.summary_dir)
+    if os.path.exists(config.checkpoint_dir):
+        os.removedirs(config.checkpoint_dir)
     create_dirs([config.summary_dir, config.checkpoint_dir])
     
     # create tensorflow session

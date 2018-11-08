@@ -56,10 +56,10 @@ class ExampleModel(BaseModel):
         loss += 5e-4 * regularizers # Add the regularization term to the loss.
 
         # Decay once per epoch, using an exponential schedule starting at 0.01.
-        learning_rate = tf.train.exponential_decay(0.01,  self.global_step_tensor, 1.0, 0.95, staircase=True)
+        self.learning_rate = tf.train.exponential_decay(0.01,  self.cur_epoch_tensor, 1.0, 0.95, staircase=True)
         
         # Use simple momentum for the optimization.
-        optimizer = tf.train.MomentumOptimizer(self.config.learning_rate, 0.9).minimize(loss, global_step=self.global_step_tensor)
+        optimizer = tf.train.MomentumOptimizer(self.learning_rate, 0.9).minimize(loss, global_step=self.global_step_tensor)
         
         self.cross_entropy = loss
         self.train_step = optimizer

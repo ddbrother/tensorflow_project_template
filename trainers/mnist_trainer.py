@@ -8,6 +8,11 @@ class ExampleTrainer(BaseTrain):
         super(ExampleTrainer, self).__init__(sess, model, data, config,logger)
 
     def train_epoch(self):
+        cur_epoch     = self.model.cur_epoch_tensor  .eval(self.sess)
+        cur_it        = self.model.global_step_tensor.eval(self.sess)
+        learning_rate = self.sess.run(self.model.learning_rate)
+        print('Training epoch %04d, learning_rate = %010.8f' %(cur_epoch,learning_rate))
+
         loop = tqdm(range(self.config.num_iter_per_epoch))
         losses = []
         accs = []
@@ -18,11 +23,11 @@ class ExampleTrainer(BaseTrain):
         loss = np.mean(losses)
         acc = np.mean(accs)
 
-        cur_it = self.model.global_step_tensor.eval(self.sess)
         summaries_dict = {
             'loss': loss,
             'acc': acc,
         }
+        print('current acc = %06.4f' %(acc))
         self.logger.summarize(cur_it, summaries_dict=summaries_dict)
         self.model.save(self.sess)
 
