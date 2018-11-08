@@ -25,10 +25,6 @@ def main():
         exit(0)
 
     # create the experiments dirs
-    if os.path.exists(config.summary_dir):
-        os.removedirs(config.summary_dir)
-    if os.path.exists(config.checkpoint_dir):
-        os.removedirs(config.checkpoint_dir)
     create_dirs([config.summary_dir, config.checkpoint_dir])
     
     # create tensorflow session
