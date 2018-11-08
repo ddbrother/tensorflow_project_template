@@ -29,9 +29,9 @@ class Logger:
                 for tag, value in summaries_dict.items():
                     if tag not in self.summary_ops:
                         if len(value.shape) <= 1:
-                            self.summary_placeholders[tag] = tf.placeholder('float32', value.shape, name=tag)
+                            self.summary_placeholders[tag] = tf.placeholder('float32', value.shape, name="value_of_"+tag)
                         else:
-                            self.summary_placeholders[tag] = tf.placeholder('float32', [None] + list(value.shape[1:]), name=tag)
+                            self.summary_placeholders[tag] = tf.placeholder('float32', [None] + list(value.shape[1:]), name="value_of_"+tag)
                         if len(value.shape) <= 1:
                             self.summary_ops[tag] = tf.summary.scalar(tag, self.summary_placeholders[tag])
                         else:
