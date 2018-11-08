@@ -59,7 +59,7 @@ class ExampleModel(BaseModel):
         learning_rate = tf.train.exponential_decay(0.01,  self.global_step_tensor, 1.0, 0.95, staircase=True)
         
         # Use simple momentum for the optimization.
-        optimizer = tf.train.MomentumOptimizer(learning_rate,0.9).minimize(loss, global_step=self.global_step_tensor)
+        optimizer = tf.train.MomentumOptimizer(self.config.learning_rate, 0.9).minimize(loss, global_step=self.global_step_tensor)
         
         self.cross_entropy = loss
         self.train_step = optimizer
