@@ -11,11 +11,12 @@ class ExampleTrainer(BaseTrain):
         cur_epoch     = self.model.cur_epoch_tensor  .eval(self.sess)
         cur_it        = self.model.global_step_tensor.eval(self.sess)
         learning_rate = self.sess.run(self.model.learning_rate)
-        print('Training epoch %04d, learning_rate = %010.8f' %(cur_epoch,learning_rate))
+        print('Training epoch %04d/%04d, learning_rate = %010.8f' %(cur_epoch,self.config.num_epochs,learning_rate))
 
         loop = tqdm(range(self.config.num_iter_per_epoch))
         losses = []
         accs = []
+        accs_validation = []
         for _ in loop:
             loss, acc = self.train_step()
             losses.append(loss)
@@ -23,11 +24,17 @@ class ExampleTrainer(BaseTrain):
         loss = np.mean(losses)
         acc = np.mean(accs)
 
+        feed_dict = {self.model.x: self.data.validation_data,
+                     self.model.y: self.data.validation_labels,
+                     self.model.is_training: True}
+        acc_validation = self.sess.run(self.model.accuracy, feed_dict=feed_dict)
+        accs_validation.append(acc_validation)
         summaries_dict = {
             'loss': loss,
             'acc': acc,
+            'acc_validation': acc_validation,
         }
-        print('current acc = %06.4f' %(acc))
+        print('current acc = %010.8f, acc_validation = %010.8f' %(acc, acc_validation))
         self.logger.summarize(cur_it, summaries_dict=summaries_dict)
         self.model.save(self.sess)
 
