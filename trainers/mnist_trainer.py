@@ -2,6 +2,9 @@ from base.base_train import BaseTrain
 from tqdm import tqdm
 import numpy as np
 
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
 
 class ExampleTrainer(BaseTrain):
     def __init__(self, sess, model, data, config,logger):
@@ -44,3 +47,15 @@ class ExampleTrainer(BaseTrain):
         _, loss, acc = self.sess.run([self.model.train_step, self.model.cross_entropy, self.model.accuracy],
                                      feed_dict=feed_dict)
         return loss, acc
+
+    def test(self):
+        batch_x, batch_y = next(self.data.next_batch(self.config.batch_size))
+        feed_dict = {self.model.x: batch_x, self.model.y: batch_y, self.model.is_training: False}
+        prediction, logits = self.sess.run([self.model.prediction, self.model.logits], feed_dict=feed_dict)
+        for k in range(batch_y.shape[0]):
+            print(logits[k])
+            image_data = batch_x[k].reshape(28,-1)
+            plt.imshow(image_data, cmap=plt.cm.gray)
+            plt.xlabel("y = %d, predict = %d" %(batch_y[k], prediction[k]))
+            plt.title("index = %d" %(k))
+            plt.show()

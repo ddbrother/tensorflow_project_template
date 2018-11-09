@@ -46,8 +46,8 @@ class ExampleModel(BaseModel):
         reshape = tf.reshape(pool2, [tf.shape(pool2)[0], pool_shape[1] * pool_shape[2] * pool_shape[3]])
         hidden = tf.nn.relu(tf.matmul(reshape, fc1_weights) + fc1_biases)
         hidden = tf.nn.dropout(hidden, self.config.keep_prob, seed=1) # set dropout keep_prob
-        logits = tf.matmul(hidden, fc2_weights) + fc2_biases
-        loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y, logits=logits))
+        self.logits = tf.matmul(hidden, fc2_weights) + fc2_biases
+        loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y, logits=self.logits))
 
         # L2 regularization for the fully connected parameters.
         regularizers = (tf.nn.l2_loss(fc1_weights) + tf.nn.l2_loss(fc1_biases)
@@ -64,7 +64,8 @@ class ExampleModel(BaseModel):
         self.cross_entropy = loss
         self.train_step = optimizer
 
-        correct_prediction = tf.equal(tf.argmax(logits, 1), self.y)
+        self.prediction = tf.argmax(self.logits, 1)
+        correct_prediction = tf.equal(self.prediction, self.y)
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     def init_saver(self):

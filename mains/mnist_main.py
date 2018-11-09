@@ -48,6 +48,8 @@ def main():
     # here you train your model
     trainer.train()
 
+    trainer.test()
+
 
 if __name__ == '__main__':
     main()
