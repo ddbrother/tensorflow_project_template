@@ -16,28 +16,33 @@ class ExampleTrainer(BaseTrain):
         learning_rate = self.sess.run(self.model.learning_rate)
         print('Training epoch %04d/%04d, learning_rate = %010.8f' %(cur_epoch,self.config.num_epochs,learning_rate))
 
-        loop = tqdm(range(self.config.num_iter_per_epoch))
+        loop = tqdm(range(self.config.num_iter_per_epoch), desc='train')
         losses = []
         accs = []
-        accs_validation = []
         for _ in loop:
             loss, acc = self.train_step()
             losses.append(loss)
             accs.append(acc)
-        loss = np.mean(losses)
-        acc = np.mean(accs)
+        train_loss = np.mean(losses)
+        train_acc = np.mean(accs)
 
-        feed_dict = {self.model.x: self.data.valid_data,
-                     self.model.y: self.data.valid_labels,
-                     self.model.is_training: True}
-        acc_validation = self.sess.run(self.model.accuracy, feed_dict=feed_dict)
-        accs_validation.append(acc_validation)
+        loop = tqdm(range(int(0.5+self.data.valid_size/self.config.batch_size)), desc='valid')
+        losses = []
+        accs = []
+        for _ in loop:
+            loss, acc = self.valid_step()
+            losses.append(loss)
+            accs.append(acc)
+        valid_loss = np.mean(losses)
+        valid_acc  = np.mean(accs)
+
         summaries_dict = {
-            'loss': loss,
-            'acc': acc,
-            'acc_validation': acc_validation,
+            'train_loss': train_loss,
+            'train_acc': train_acc,
+            'valid_loss': valid_loss,
+            'valid_acc': valid_acc,
         }
-        print('current acc = %010.8f, acc_validation = %010.8f' %(acc, acc_validation))
+        print('current train_acc = %010.8f, valid_acc = %010.8f' %(train_acc, valid_acc))
         self.logger.summarize(cur_it, summaries_dict=summaries_dict)
         self.model.save(self.sess)
 
@@ -48,16 +53,40 @@ class ExampleTrainer(BaseTrain):
                                      feed_dict=feed_dict)
         return loss, acc
 
+    def valid_step(self):
+        batch_x, batch_y = next(self.data.valid_next_batch(self.config.batch_size))
+        feed_dict = {self.model.x: batch_x, self.model.y: batch_y, self.model.is_training: True}
+        loss, acc = self.sess.run([self.model.cross_entropy, self.model.accuracy], feed_dict=feed_dict)
+        return loss, acc
+
+    def test_step(self):
+        batch_x, batch_y = next(self.data.test_next_batch(self.config.batch_size))
+        feed_dict = {self.model.x: batch_x, self.model.y: batch_y, self.model.is_training: True}
+        loss, acc = self.sess.run([self.model.cross_entropy, self.model.accuracy], feed_dict=feed_dict)
+        return loss, acc
+
     def test(self):
-        x = self.data.valid_data
-        y = self.data.valid_labels
-        feed_dict = {self.model.x: x, self.model.y: y, self.model.is_training: False}
-        prediction, logits = self.sess.run([self.model.prediction, self.model.logits], feed_dict=feed_dict)
-        for k in range(y.shape[0]):
-            if prediction[k] != y[k]:
-                print(logits[k])
-                image_data = x[k].reshape(28,-1)
+        loop = tqdm(range(int(0.5+self.data.test_size/self.config.batch_size)), desc='test auto statistic')
+        losses = []
+        accs = []
+        for _ in loop:
+            loss, acc = self.test_step()
+            losses.append(loss)
+            accs.append(acc)
+        loss = np.mean(losses)
+        acc  = np.mean(accs)
+        print("test_acc =", acc, "test_loss =", loss)
+        
+        loop = tqdm(range(self.data.test_size), desc='test manual')
+        for k in loop:
+            x = self.data.test_data[[k]]
+            y = self.data.test_labels[[k]]
+            feed_dict = {self.model.x: x, self.model.y: y, self.model.is_training: False}
+            prediction, logits = self.sess.run([self.model.prediction, self.model.logits], feed_dict=feed_dict)
+            if prediction[0] != y[0]:
+                print(logits)
+                image_data = x[0].reshape(28,-1)
                 plt.imshow(image_data, cmap=plt.cm.gray)
-                plt.xlabel("y = %d, predict = %d" %(y[k], prediction[k]))
+                plt.xlabel("y = %d, predict = %d" %(y[0], prediction[0]))
                 plt.title("index = %d" %(k))
                 plt.show()
