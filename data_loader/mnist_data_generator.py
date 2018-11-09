@@ -46,22 +46,35 @@ class DataGenerator:
 
         # Generate a validation set.
         self.num_epochs = self.config.num_epochs
-        self.validation_size = int(self.train_labels.shape[0] * self.config.validation_ratio)
+        self.valid_size = int(self.train_labels.shape[0] * self.config.validation_ratio)
 
-        self.validation_data   = self.train_data[:self.validation_size, ...]
-        self.validation_labels = self.train_labels[:self.validation_size]
-        self.train_data   = self.train_data[self.validation_size:, ...]
-        self.train_labels = self.train_labels[self.validation_size:]
+        self.valid_data   = self.train_data[:self.valid_size, ...]
+        self.valid_labels = self.train_labels[:self.valid_size]
+        self.train_data   = self.train_data[self.valid_size:, ...]
+        self.train_labels = self.train_labels[self.valid_size:]
 
         self.train_size = self.train_labels.shape[0]
         self.test_size = self.test_labels.shape[0]
         
         self.train_index = 0  # start index of data
-        self.validation_index = 0
+        self.valid_index = 0
         self.test_index = 0
     
-    def next_batch(self, batch_size):
+    def train_next_batch(self, batch_size):
         idx = np.arange(self.train_index, self.train_index+batch_size, 1)
         idx = idx % self.train_size
         self.train_index = (self.train_index + batch_size) % self.train_size
         yield self.train_data[idx], self.train_labels[idx]
+    
+    def valid_next_batch(self, batch_size):
+        idx = np.arange(self.valid_index, self.valid_index+batch_size, 1)
+        idx = idx % self.valid_size
+        self.valid_index = (self.valid_index + batch_size) % self.valid_size
+        yield self.valid_data[idx], self.valid_labels[idx]
+
+    def test_next_batch(self, batch_size):
+        idx = np.arange(self.test_index, self.test_index+batch_size, 1)
+        idx = idx % self.test_size
+        self.test_index = (self.test_index + batch_size) % self.test_size
+        yield self.test_data[idx], self.test_labels[idx]
+

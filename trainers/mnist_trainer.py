@@ -27,8 +27,8 @@ class ExampleTrainer(BaseTrain):
         loss = np.mean(losses)
         acc = np.mean(accs)
 
-        feed_dict = {self.model.x: self.data.validation_data,
-                     self.model.y: self.data.validation_labels,
+        feed_dict = {self.model.x: self.data.valid_data,
+                     self.model.y: self.data.valid_labels,
                      self.model.is_training: True}
         acc_validation = self.sess.run(self.model.accuracy, feed_dict=feed_dict)
         accs_validation.append(acc_validation)
@@ -42,15 +42,15 @@ class ExampleTrainer(BaseTrain):
         self.model.save(self.sess)
 
     def train_step(self):
-        batch_x, batch_y = next(self.data.next_batch(self.config.batch_size))
+        batch_x, batch_y = next(self.data.train_next_batch(self.config.batch_size))
         feed_dict = {self.model.x: batch_x, self.model.y: batch_y, self.model.is_training: True}
         _, loss, acc = self.sess.run([self.model.train_step, self.model.cross_entropy, self.model.accuracy],
                                      feed_dict=feed_dict)
         return loss, acc
 
     def test(self):
-        x = self.data.validation_data
-        y = self.data.validation_labels
+        x = self.data.valid_data
+        y = self.data.valid_labels
         feed_dict = {self.model.x: x, self.model.y: y, self.model.is_training: False}
         prediction, logits = self.sess.run([self.model.prediction, self.model.logits], feed_dict=feed_dict)
         for k in range(y.shape[0]):
