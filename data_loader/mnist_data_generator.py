@@ -55,7 +55,13 @@ class DataGenerator:
 
         self.train_size = self.train_labels.shape[0]
         self.test_size = self.test_labels.shape[0]
+        
+        self.train_index = 0  # start index of data
+        self.validation_index = 0
+        self.test_index = 0
     
     def next_batch(self, batch_size):
-        idx = np.random.choice(self.train_size, batch_size)
+        idx = np.arange(self.train_index, self.train_index+batch_size, 1)
+        idx = idx % self.train_size
+        self.train_index = (self.train_index + batch_size) % self.train_size
         yield self.train_data[idx], self.train_labels[idx]
