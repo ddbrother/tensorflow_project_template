@@ -14,7 +14,7 @@
   "num_channels" : 1,
   "pixel_depth" : 255,
   "num_labels" : 10,
-  "validation_ratio" : 0.1,
+  "validation_ratio" : 0.02,
   "seed" : 66478,
   "eval_batch_size" : 64,
   "eval_frequency" : 100,

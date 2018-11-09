@@ -49,13 +49,15 @@ class ExampleTrainer(BaseTrain):
         return loss, acc
 
     def test(self):
-        batch_x, batch_y = next(self.data.next_batch(self.config.batch_size))
-        feed_dict = {self.model.x: batch_x, self.model.y: batch_y, self.model.is_training: False}
+        x = self.data.validation_data
+        y = self.data.validation_labels
+        feed_dict = {self.model.x: x, self.model.y: y, self.model.is_training: False}
         prediction, logits = self.sess.run([self.model.prediction, self.model.logits], feed_dict=feed_dict)
-        for k in range(batch_y.shape[0]):
-            print(logits[k])
-            image_data = batch_x[k].reshape(28,-1)
-            plt.imshow(image_data, cmap=plt.cm.gray)
-            plt.xlabel("y = %d, predict = %d" %(batch_y[k], prediction[k]))
-            plt.title("index = %d" %(k))
-            plt.show()
+        for k in range(y.shape[0]):
+            if prediction[k] != y[k]:
+                print(logits[k])
+                image_data = x[k].reshape(28,-1)
+                plt.imshow(image_data, cmap=plt.cm.gray)
+                plt.xlabel("y = %d, predict = %d" %(y[k], prediction[k]))
+                plt.title("index = %d" %(k))
+                plt.show()
