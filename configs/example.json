@@ -1,9 +1,9 @@
 {
   "exp_name": "example",
-  "num_epochs": 50,
-  "num_iter_per_epoch": 54,
+  "num_epochs": 20,
+  "num_iter_per_epoch": 540,
   "learning_rate": 0.02,
-  "decay_rate": 0.97,
+  "decay_rate": 0.95,
   "decay_steps": 1,
   "batch_size": 100,
   "state_size": [784],
@@ -18,7 +18,5 @@
   "num_labels" : 10,
   "validation_ratio" : 0.01667,
   "seed" : 66478,
-  "eval_batch_size" : 64,
-  "eval_frequency" : 100,
-  "keep_prob": 0.5
+  "keep_prob": 1.0
 }
