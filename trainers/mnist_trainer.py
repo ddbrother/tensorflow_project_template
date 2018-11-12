@@ -89,4 +89,4 @@ class ExampleTrainer(BaseTrain):
                 plt.imshow(image_data, cmap=plt.cm.gray)
                 plt.xlabel("y = %d, predict = %d" %(y[0], prediction[0]))
                 plt.title("index = %d" %(k))
-                plt.show()
+                plt.show(block=True)

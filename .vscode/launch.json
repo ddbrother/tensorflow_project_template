@@ -62,7 +62,11 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "externalTerminal"
+            "console": "externalTerminal",
+            "args": [
+                "--config",
+                "configs/example.json"
+            ]
         }
     ]
 }
