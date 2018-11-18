@@ -15,21 +15,23 @@ class ExampleModel(BaseModel):
             shape=(None, self.config.image_size, self.config.image_size, self.config.num_channels),
             name='image_input')
         self.y = tf.placeholder(tf.int64, shape=(None,))
-
-        conv1_weights = tf.Variable(tf.truncated_normal([5, 5, self.config.num_channels, 32],
+        conv1_channels = 8
+        conv2_channels = 16
+        fc1_channels = 128
+        conv1_weights = tf.Variable(tf.truncated_normal([5, 5, self.config.num_channels, conv1_channels],
                                     stddev=0.1, seed=self.config.seed, dtype=data_type()))
-        conv1_biases = tf.Variable(tf.zeros([32], dtype=data_type()))
+        conv1_biases = tf.Variable(tf.zeros([conv1_channels], dtype=data_type()))
         
-        conv2_weights = tf.Variable(tf.truncated_normal([5, 5, 32, 64], stddev=0.1,
+        conv2_weights = tf.Variable(tf.truncated_normal([5, 5, conv1_channels, conv2_channels], stddev=0.1,
                                                         seed=self.config.seed, dtype=data_type()))
-        conv2_biases = tf.Variable(tf.constant(0.1, shape=[64], dtype=data_type()))
+        conv2_biases = tf.Variable(tf.constant(0.1, shape=[conv2_channels], dtype=data_type()))
         
-        fc1_weights = tf.Variable(  # fully connected, depth 512.
-            tf.truncated_normal([self.config.image_size // 4 * self.config.image_size // 4 * 64, 512],
+        fc1_weights = tf.Variable(  # fully connected, depth fc1_channels.
+            tf.truncated_normal([self.config.image_size // 4 * self.config.image_size // 4 * conv2_channels, fc1_channels],
                                 stddev=0.1, seed=self.config.seed, dtype=data_type()))
-        fc1_biases  = tf.Variable(tf.constant(0.1, shape=[512], dtype=data_type()))
+        fc1_biases  = tf.Variable(tf.constant(0.1, shape=[fc1_channels], dtype=data_type()))
         
-        fc2_weights = tf.Variable(tf.truncated_normal([512, self.config.num_labels],
+        fc2_weights = tf.Variable(tf.truncated_normal([fc1_channels, self.config.num_labels],
                                                     stddev=0.1, seed=self.config.seed, dtype=data_type()))
         fc2_biases  = tf.Variable(tf.constant(0.1, shape=[self.config.num_labels], dtype=data_type()))
 
