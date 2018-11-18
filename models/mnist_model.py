@@ -63,7 +63,7 @@ class ExampleModel(BaseModel):
                   + np.prod(fc2_weights.shape)   + np.prod(fc2_biases.shape))
         var_num = var_num.value
 
-        loss += 10*regularizers/var_num # Add the regularization term to the loss.
+        loss += 100*regularizers/var_num # Add the regularization term to the loss.
 
         # Decay once per epoch, using an exponential schedule starting at 0.01.
         self.learning_rate = tf.train.exponential_decay(

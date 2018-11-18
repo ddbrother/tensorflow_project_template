@@ -1,6 +1,6 @@
 {
   "exp_name": "example",
-  "num_epochs": 20,
+  "num_epochs": 50,
   "num_iter_per_epoch": 540,
   "learning_rate": 0.02,
   "decay_rate": 0.95,
