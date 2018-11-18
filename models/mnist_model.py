@@ -1,7 +1,7 @@
 from base.base_model import BaseModel
 import tensorflow as tf
 from utils.config import data_type
-
+import numpy as np
 
 class ExampleModel(BaseModel):
     def __init__(self, config):
@@ -16,8 +16,8 @@ class ExampleModel(BaseModel):
             name='image_input')
         self.y = tf.placeholder(tf.int64, shape=(None,))
         conv1_channels = 8
-        conv2_channels = 16
-        fc1_channels = 128
+        conv2_channels = 8
+        fc1_channels = 64
         conv1_weights = tf.Variable(tf.truncated_normal([5, 5, self.config.num_channels, conv1_channels],
                                     stddev=0.1, seed=self.config.seed, dtype=data_type()))
         conv1_biases = tf.Variable(tf.zeros([conv1_channels], dtype=data_type()))
@@ -52,10 +52,18 @@ class ExampleModel(BaseModel):
         loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y, logits=self.logits))
 
         # L2 regularization for the fully connected parameters.
-        regularizers = (tf.nn.l2_loss(fc1_weights) + tf.nn.l2_loss(fc1_biases)
-                      + tf.nn.l2_loss(fc2_weights) + tf.nn.l2_loss(fc2_biases))
-       
-        loss += 5e-4 * regularizers # Add the regularization term to the loss.
+        regularizers = (tf.nn.l2_loss(conv1_weights) + tf.nn.l2_loss(conv1_biases)
+                      + tf.nn.l2_loss(conv2_weights) + tf.nn.l2_loss(conv2_biases)
+                      + tf.nn.l2_loss(fc1_weights)   + tf.nn.l2_loss(fc1_biases)
+                      + tf.nn.l2_loss(fc2_weights)   + tf.nn.l2_loss(fc2_biases))
+
+        var_num = (np.prod(conv1_weights.shape) + np.prod(conv1_biases.shape)
+                  + np.prod(conv2_weights.shape) + np.prod(conv2_biases.shape)
+                  + np.prod(fc1_weights.shape)   + np.prod(fc1_biases.shape)
+                  + np.prod(fc2_weights.shape)   + np.prod(fc2_biases.shape))
+        var_num = var_num.value
+
+        loss += 10*regularizers/var_num # Add the regularization term to the loss.
 
         # Decay once per epoch, using an exponential schedule starting at 0.01.
         self.learning_rate = tf.train.exponential_decay(
