@@ -4,6 +4,7 @@ import numpy as np
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class ExampleTrainer(BaseTrain):
@@ -90,3 +91,32 @@ class ExampleTrainer(BaseTrain):
                 plt.xlabel("y = %d, predict = %d" %(y[0], prediction[0]))
                 plt.title("index = %d" %(k))
                 plt.show(block=True)
+
+    def competition_test(self):
+        loop = tqdm(range(int(0.5+self.data.test_size/self.config.batch_size)), desc='test auto statistic')
+        losses = []
+        accs = []
+        for _ in loop:
+            loss, acc = self.test_step()
+            losses.append(loss)
+            accs.append(acc)
+        loss = np.mean(losses)
+        acc  = np.mean(accs)
+        print("test_acc =", acc, "test_loss =", loss)
+
+        loop = tqdm(range(self.data.test_size), desc='test manual')
+        results = np.zeros([self.data.test_size],dtype=np.int64)
+        for k in loop:
+            x = self.data.test_data[[k]]
+            y = self.data.test_labels[[k]]
+            feed_dict = {self.model.x: x, self.model.y: y, self.model.is_training: False}
+            prediction, logits = self.sess.run([self.model.prediction, self.model.logits], feed_dict=feed_dict)
+            results[k] = prediction[0]
+            
+
+        results = pd.Series(results,name="Label")
+        submission = pd.concat([pd.Series(range(1,28001),name = "ImageId"),results],axis = 1)
+        submission.to_csv("my_submission.csv",index=False)
+        print("save to csv completed.")
+
+

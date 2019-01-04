@@ -23,7 +23,7 @@ import tensorflow as tf
 
 import keras
 from keras.datasets import mnist
-
+import pandas as pd
 
 class DataGenerator:
     
@@ -35,8 +35,8 @@ class DataGenerator:
         (self.train_data, self.train_labels), (self.test_data, self.test_labels) = mnist.load_data()
         self.train_data   = self.train_data  .reshape(-1,28,28,1).astype(np.float32)
         self.train_labels = self.train_labels.reshape(-1)        .astype(np.int64)
-        self.test_data   = self.test_data  .reshape(-1,28,28,1).astype(np.float32)
-        self.test_labels = self.test_labels.reshape(-1)        .astype(np.int64)
+        self.test_data = pd.read_csv("../test.csv").values.reshape(-1,28,28,1).astype(np.float32)
+        self.test_labels = np.ones([self.test_data.shape[0]],dtype=np.int64)
 
         self.train_data = 2.0*self.train_data/self.config.pixel_depth - 1.0
         self.test_data  = 2.0*self.test_data /self.config.pixel_depth - 1.0
@@ -50,8 +50,8 @@ class DataGenerator:
 
         self.valid_data   = self.train_data[:self.valid_size, ...]
         self.valid_labels = self.train_labels[:self.valid_size]
-        self.train_data   = self.train_data[self.valid_size:, ...]
-        self.train_labels = self.train_labels[self.valid_size:]
+        # self.train_data   = self.train_data[self.valid_size:, ...]
+        # self.train_labels = self.train_labels[self.valid_size:]
 
         self.train_size = self.train_labels.shape[0]
         self.test_size = self.test_labels.shape[0]
